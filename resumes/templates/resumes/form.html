@@ -1,0 +1,56 @@
+<h2>Resume Builder</h2>
+
+{% if autofilled %}
+  <p style="color: green;">
+    Resume detected ✔️ You can edit the details.
+  </p>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <label>Full name:</label><br>
+  <input type="text" name="full_name" value="{{ data.full_name|default:'' }}"><br><br>
+
+  <label>Title:</label><br>
+  <input type="text" name="title" value="{{ data.title|default:'' }}"><br><br>
+
+  <label>Email:</label><br>
+  <input type="email" name="email" value="{{ data.email|default:'' }}"><br><br>
+
+  <label>Phone:</label><br>
+  <input type="text" name="phone" value="{{ data.phone|default:'' }}"><br><br>
+
+  <label>LinkedIn:</label><br>
+  <input type="text" name="linkedin" value="{{ data.linkedin|default:'' }}"><br><br>
+
+  <label>GitHub:</label><br>
+  <input type="text" name="github" value="{{ data.github|default:'' }}"><br><br>
+
+  <label>Summary:</label><br>
+  <textarea name="summary">{{ data.summary|default:'' }}</textarea><br><br>
+
+  <label>Skills (comma separated):</label><br>
+  <textarea name="skills">{{ data.skills|default:'' }}</textarea><br><br>
+
+  <label>Experience:</label><br>
+  <textarea name="experience">{{ data.experience|default:'' }}</textarea><br><br>
+
+  <label>Projects:</label><br>
+  <textarea name="projects">{{ data.projects|default:'' }}</textarea><br><br>
+
+  <label>Education:</label><br>
+  <textarea name="education">{{ data.education|default:'' }}</textarea><br><br>
+
+  <label>Upload Resume (optional):</label><br>
+  <input type="file" name="uploaded_resume"><br><br>
+
+  <!-- TWO ACTIONS -->
+  <button type="submit" name="action" value="autofill">
+    Auto Fill from Resume
+  </button>
+
+  <button type="submit" name="action" value="generate">
+    Generate Resume
+  </button>
+</form>
