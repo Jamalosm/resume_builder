@@ -18,15 +18,44 @@ DATE_RANGE_REGEX = re.compile(
 )
 
 # =========================
+# LATEX SANITIZER
+# =========================
+def tex_escape(text: str) -> str:
+    if not text:
+        return ""
+
+    replacements = {
+        "&": r"\&",
+        "%": r"\%",
+        "$": r"\$",
+        "#": r"\#",
+        "_": r"\_",
+        "{": r"\{",
+        "}": r"\}",
+        "~": r"\textasciitilde{}",
+        "^": r"\textasciicircum{}",
+    }
+
+    for k, v in replacements.items():
+        text = text.replace(k, v)
+
+    # Normalize unicode dashes
+    text = text.replace("–", "--").replace("—", "--")
+
+    return text
+
+
+# =========================
 # ITEMIZE
 # =========================
 def itemize(lines):
-    items = "\n".join(f"\\item {l}" for l in lines)
-    return f"""
-\\begin{{itemize}}
-{items}
-\\end{{itemize}}
-"""
+    items = "\n".join(f"\\item {tex_escape(l)}" for l in lines)
+    return (
+        "\\begin{itemize}\n"
+        f"{items}\n"
+        "\\end{itemize}"
+    )
+
 
 # =========================
 # SKILLS FORMATTER
@@ -43,11 +72,15 @@ def format_skills(text: str) -> str:
 
         if ":" in line:
             h, v = line.split(":", 1)
-            out.append(f"\\textbf{{{h.strip()}:}} {v.strip()} \\\\")
+            out.append(
+                f"\\textbf{{{tex_escape(h.strip())}:}} "
+                f"{tex_escape(v.strip())} \\\\"
+            )
         else:
-            out.append(line + " \\\\")
+            out.append(tex_escape(line) + " \\\\")
 
     return "\n".join(out)
+
 
 # =========================
 # EXPERIENCE / PROJECT FORMATTER
@@ -83,7 +116,7 @@ def format_block(text: str) -> str:
             environment = line.strip("()")
             continue
 
-        # ROLE (short title, no period)
+        # Role
         if not role and len(line.split()) <= 6 and not line.endswith("."):
             role = line
             continue
@@ -93,32 +126,35 @@ def format_block(text: str) -> str:
             company = line
             continue
 
-        # PROJECT NAME
+        # Project title
         if line[0].isupper() and not line.endswith("."):
             flush_bullets()
-            output.append(f"\\textbf{{{line}}}")
+            output.append(f"\\textbf{{{tex_escape(line)}}}")
             continue
 
         # Bullet
-        clean = re.sub(r"^[•\-–ˆ]\s*", "", line)
+        clean = re.sub(r"^[•\-–]\s*", "", line)
         bullets.append(clean)
 
     flush_bullets()
 
-    header = []
+    header_lines = []
 
     if role:
         if date_range:
-            header.append(
-                f"\\textbf{{{role}}} \\hfill \\textbf{{{date_range}}}"
+            header_lines.append(
+                f"\\textbf{{{tex_escape(role)}}} "
+                f"\\hfill \\textbf{{{tex_escape(date_range)}}}"
             )
         else:
-            header.append(f"\\textbf{{{role}}}")
+            header_lines.append(f"\\textbf{{{tex_escape(role)}}}")
 
     if company:
-        header.append(f"\\\\ \\textbf{{{company}}}")
+        header_lines.append(f"\\textbf{{{tex_escape(company)}}}")
 
     if environment:
-        header.append(f"\\\\ \\textit{{{environment}}}")
+        header_lines.append(f"\\textit{{{tex_escape(environment)}}}")
 
-    return "\n".join(header + output)
+    header = " \\\\\n".join(header_lines)
+
+    return "\n".join([header] + output)

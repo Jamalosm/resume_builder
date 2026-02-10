@@ -1,28 +1,25 @@
-
 from pathlib import Path
 import os
 
-
-
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# =========================
+# BASE DIR
+# =========================
 BASE_DIR = Path(__file__).resolve().parent.parent
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# =========================
+# SECURITY
+# =========================
 SECRET_KEY = 'django-insecure-96he#z4mzg#kn$%3xl882t^e7%*6#hnqat9ja3q+5!h!f_9=c1'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 
-
-
-# Application definition
-
+# =========================
+# APPLICATIONS
+# =========================
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -30,9 +27,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'resumes',
 ]
 
+
+# =========================
+# MIDDLEWARE
+# =========================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -42,16 +44,29 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 X_FRAME_OPTIONS = "SAMEORIGIN"
+
+
+# =========================
+# URLS & WSGI
+# =========================
 ROOT_URLCONF = 'easy_resume_builder.urls'
 
+WSGI_APPLICATION = 'easy_resume_builder.wsgi.application'
+
+
+# =========================
+# TEMPLATES
+# =========================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -60,12 +75,10 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'easy_resume_builder.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
+# =========================
+# DATABASE
+# =========================
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -74,9 +87,9 @@ DATABASES = {
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
-
+# =========================
+# PASSWORD VALIDATION
+# =========================
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -93,32 +106,33 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/6.0/topics/i18n/
-
+# =========================
+# INTERNATIONALIZATION
+# =========================
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
-STATIC_URL = 'static/'
-
-
-DEBUG = False
-
-ALLOWED_HOSTS = ["*"]  # Railway safe for demo
-
+# =========================
+# STATIC FILES
+# =========================
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://*.up.railway.app",
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
 ]
 
+
+# =========================
+# MEDIA FILES
+# =========================
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+
+# =========================
+# DEFAULT PRIMARY KEY
+# =========================
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
