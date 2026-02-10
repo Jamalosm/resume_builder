@@ -15,7 +15,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 CMD gunicorn easy_resume_builder.wsgi:application \
+    --env DJANGO_SETTINGS_MODULE=easy_resume_builder.settings \
     --bind 0.0.0.0:$PORT \
     --workers 2 \
     --threads 2 \
     --timeout 120
+
