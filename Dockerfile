@@ -2,10 +2,10 @@ FROM python:3.12-slim
 
 # Install LaTeX
 RUN apt-get update && apt-get install -y \
-    texlive-latex-extra \
+    texlive-latex-base \
     texlive-fonts-recommended \
-    texlive-xetex \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Set working directory
 WORKDIR /app
