@@ -14,6 +14,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project
-COPY . .
-CMD gunicorn easy_resume_builder.wsgi:application --bind 0.0.0.0:$PORT
+CMD gunicorn easy_resume_builder.wsgi:application \
+    --bind 0.0.0.0:$PORT \
+    --workers 2 \
+    --threads 2 \
+    --timeout 120
