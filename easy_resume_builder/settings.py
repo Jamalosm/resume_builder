@@ -54,7 +54,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
+X_FRAME_OPTIONS = "SAMEORIGIN"
 ROOT_URLCONF = 'easy_resume_builder.urls'
 
 TEMPLATES = [
@@ -121,3 +121,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+
+DEBUG = False
+
+ALLOWED_HOSTS = ["*"]  # Railway safe for demo
+
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
