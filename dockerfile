@@ -16,6 +16,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project
 COPY . .
-
-# Railway uses PORT env
-CMD ["gunicorn", "resume_builder.wsgi:application", "--bind", "0.0.0.0:$PORT"]
+CMD gunicorn easy_resume_builder.wsgi:application --bind 0.0.0.0:$PORT
