@@ -56,6 +56,9 @@ def format_block(text: str) -> str:
     if not text:
         return ""
 
+    # Normalize dash
+    text = text.replace("–", "-").replace("—", "-")
+
     lines = [l.strip() for l in text.split("\n") if l.strip()]
 
     role = ""
@@ -72,39 +75,56 @@ def format_block(text: str) -> str:
             bullets = []
 
     for line in lines:
-        # Date range
+
+        # -------------------------
+        # Date range detection
+        # -------------------------
         m = DATE_RANGE_REGEX.search(line)
         if m:
             date_range = m.group(1)
             continue
 
-        # Environment
+        # -------------------------
+        # Environment detection
+        # -------------------------
         if line.startswith("(") and line.endswith(")"):
             environment = line.strip("()")
             continue
 
-        # ROLE (short title, no period)
-        if not role and len(line.split()) <= 6 and not line.endswith("."):
+        # -------------------------
+        # Role detection (only first line)
+        # -------------------------
+        if not role:
             role = line
             continue
 
-        # Company
-        if "," in line and not line.endswith("."):
+        # -------------------------
+        # Company detection
+        # -------------------------
+        if not company and "," in line:
             company = line
             continue
 
-        # PROJECT NAME
-        if line[0].isupper() and not line.endswith("."):
+        # -------------------------
+        # STRICT Project Name Detection
+        # (only if explicitly separated by hyphen)
+        # -------------------------
+        if " - " in line and len(line.split()) <= 8:
             flush_bullets()
             output.append(f"\\textbf{{{line}}}")
             continue
 
-        # Bullet
-        clean = re.sub(r"^[•\-–ˆ]\s*", "", line)
+        # -------------------------
+        # Bullet lines
+        # -------------------------
+        clean = re.sub(r"^[•\\-–ˆ]\s*", "", line)
         bullets.append(clean)
 
     flush_bullets()
 
+    # -------------------------
+    # Header Section
+    # -------------------------
     header = []
 
     if role:
@@ -116,9 +136,10 @@ def format_block(text: str) -> str:
             header.append(f"\\textbf{{{role}}}")
 
     if company:
-        header.append(f"\\\\ \\textbf{{{company}}}")
+        header.append(company)
 
     if environment:
-        header.append(f"\\\\ \\textit{{{environment}}}")
+        header.append(f"\\textit{{{environment}}}")
 
-    return "\n".join(header + output)
+    return "\n\n".join(header + output)
+

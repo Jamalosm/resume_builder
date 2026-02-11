@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.files.base import ContentFile
+import json
+
 from .models import Resume
 from .services.resume_parser import parse_resume
 from .services.latex_renderer import render_latex
 from .services.pdf_generator import generate_pdf
+from .services.llm.jd_alignment import align_resume_to_jd
 
 
 def create_resume(request):
@@ -12,7 +15,9 @@ def create_resume(request):
     if request.method == "POST":
         action = request.POST.get("action")
 
-        # ---------- AUTO FILL ----------
+        # =========================
+        # AUTO FILL
+        # =========================
         if action == "autofill":
             if "uploaded_resume" in request.FILES:
                 parsed = parse_resume(request.FILES["uploaded_resume"])
@@ -20,7 +25,9 @@ def create_resume(request):
                 context["autofilled"] = True
             return render(request, "resumes/form.html", context)
 
-        # ---------- GENERATE DIRECT ----------
+        # =========================
+        # GENERATE PDF
+        # =========================
         if action == "generate":
             resume = Resume.objects.create(
                 full_name=request.POST.get("full_name", ""),
@@ -47,6 +54,50 @@ def create_resume(request):
             )
 
             return redirect("preview", resume.id)
+
+        # =========================
+        # AI ANALYZE (FAST + OPTIMIZED)
+        # =========================
+        if action == "analyze":
+            jd_text = request.POST.get("jd_text", "")
+
+            resume_text = "\n".join([
+                request.POST.get("summary", ""),
+                request.POST.get("skills", ""),
+                request.POST.get("experience", ""),
+                request.POST.get("projects", ""),
+                request.POST.get("education", "")
+            ])
+
+            # 🔥 SPEED OPTIMIZATION
+            resume_text = resume_text[:600]
+            jd_text = jd_text[:600]
+
+            try:
+                raw_response = align_resume_to_jd(
+                    resume_text,
+                    jd_text
+                )
+
+                # Try parsing JSON safely
+                try:
+                    result_json = align_resume_to_jd(resume_text, jd_text)
+                except Exception as e:
+                    result_json = {
+                        "error": str(e)
+                                    }
+
+
+            except Exception as e:
+                result_json = {
+                    "error": str(e)
+                }
+
+            context["analysis"] = result_json
+            context["jd_text"] = jd_text
+            context["data"] = request.POST
+
+            return render(request, "resumes/form.html", context)
 
     return render(request, "resumes/form.html", context)
 

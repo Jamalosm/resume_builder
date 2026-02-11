@@ -23,3 +23,9 @@ class Resume(models.Model):
 
     def __str__(self):
         return self.full_name
+
+class ResumeAnalysis(models.Model):
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE)
+    jd_text = models.TextField()
+    result_json = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)

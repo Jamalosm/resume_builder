@@ -1,13 +1,18 @@
 from .latex_utils import format_skills, format_block
 
+
 # =========================
-# LaTeX Escaper
+# SAFE LATEX ESCAPER
 # =========================
 def escape_latex(text: str) -> str:
     if not text:
         return ""
 
-    rep = {
+    # Normalize unicode dashes
+    text = text.replace("–", "-")
+    text = text.replace("—", "-")
+
+    replacements = {
         "\\": r"\textbackslash{}",
         "&": r"\&",
         "%": r"\%",
@@ -20,17 +25,20 @@ def escape_latex(text: str) -> str:
         "^": r"\textasciicircum{}",
     }
 
-    for k, v in rep.items():
+    for k, v in replacements.items():
         text = text.replace(k, v)
 
     return text
 
+
 # =========================
-# LATEX TEMPLATE
+# LATEX TEMPLATE (SAFE)
 # =========================
 LATEX_TEMPLATE = r"""
 \documentclass[10pt]{{article}}
 
+\usepackage[utf8]{{inputenc}}
+\usepackage[T1]{{fontenc}}
 \usepackage[a4paper,margin=0.6in]{{geometry}}
 \usepackage{{enumitem}}
 \usepackage[hidelinks]{{hyperref}}
@@ -79,8 +87,9 @@ LATEX_TEMPLATE = r"""
 \end{{document}}
 """
 
+
 # =========================
-# FINAL RENDER
+# FINAL RENDER FUNCTION
 # =========================
 def render_latex(resume):
     return LATEX_TEMPLATE.format(
@@ -97,9 +106,12 @@ def render_latex(resume):
         experience=format_block(
             escape_latex(resume.experience)
         ),
+
         projects=format_block(
             escape_latex(resume.projects)
         ),
 
-        education=escape_latex(resume.education),
+        education=format_block(
+            escape_latex(resume.education)
+        ),
     )
